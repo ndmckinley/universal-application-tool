@@ -11,6 +11,9 @@ lazy val root = (project in file("."))
       // Testing libraries for dealing with CompletionStage...
       "org.assertj" % "assertj-core" % "3.14.0" % Test,
       "org.awaitility" % "awaitility" % "4.0.1" % Test,
+      // database
+      javaJdbc,
+      "org.postgresql" % "postgresql" % "42.2.18",
     ),
     javacOptions ++= Seq(
       "-encoding", "UTF-8",

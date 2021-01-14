@@ -2,12 +2,15 @@
 version: '3.1'
 
 services:
-
   db:
+    # note no ports - cannot be connected to from outside this set of services
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_PASSWORD: localdbpass
+      POSTGRES_USER: localdb
+      POSTGRES_DB: db
+
 
   adminer:
     image: adminer
