@@ -16,6 +16,7 @@ import java.util.concurrent.CompletionStage;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static play.api.test.Helpers.testServerPort;
 import static play.test.Helpers.contentAsString;
 import static play.test.Helpers.fakeApplication;
 import static play.test.Helpers.fakeRequest;
@@ -51,10 +52,9 @@ public class FunctionalTest extends WithApplication {
   public void listPersons() {
     Http.RequestBuilder request =
         fakeRequest(routes.PostgresController.list())
-            .header(Http.HeaderNames.HOST, "localhost:" + play.api.test.Helpers.testServerPort());
+            .header(Http.HeaderNames.HOST, "localhost:" + testServerPort());
     Result result = route(app, request);
 
-    System.out.println(contentAsString(result));
     assertThat(result.status()).isEqualTo(OK);
     assertThat(contentAsString(result))
         .isEqualTo("1: Alice\n2: Bob\n3: Charles\n4: Diana\n5: Eliza\n");
@@ -64,7 +64,7 @@ public class FunctionalTest extends WithApplication {
   public void addPerson() {
     Http.RequestBuilder request =
         fakeRequest(routes.PostgresController.add("John"))
-            .header(Http.HeaderNames.HOST, "localhost:" + play.api.test.Helpers.testServerPort());
+            .header(Http.HeaderNames.HOST, "localhost:" + testServerPort());
     Result result = route(app, request);
 
     assertThat(result.status()).isEqualTo(OK);
