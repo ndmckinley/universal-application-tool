@@ -26,6 +26,10 @@ Parameters:
     Description: Current timestamp in seconds.
     Type: Number
 Resources:
+  Filestore:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/seattle-uat-cftmpl/${Timestamp}/filestorage.yaml'
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
