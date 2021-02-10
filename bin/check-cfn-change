@@ -31,4 +31,4 @@ for csn in $(aws cloudformation describe-change-set --change-set-name auto-chang
 	aws cloudformation describe-change-set --change-set-name $csn | jq '.Changes[] | if .ResourceChange.Replacement == "True" then .ResourceChange.LogicalResourceId else null end' >> /tmp/message
 done
 
-echo "::set-output name=changes::$(cat /tmp/message)"
+echo "::set-output name=changes_msg::$(cat /tmp/message)"
