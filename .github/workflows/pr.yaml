@@ -50,6 +50,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
+      - name: Run check-change.
+        run: bin/check-cfn-change
+
       - uses: mshick/add-pr-comment@v1
         if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
         with:

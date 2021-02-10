@@ -1,7 +1,12 @@
 #!/bin/bash
 
+if [ -z "$GITHUB_EVENT_PATH" ];
+	PR_NUMBER=localrun-$USER
+else
+	PR_NUMBER=$(jq -r .pull_request.number "$GITHUB_EVENT_PATH")
+fi
+
 set -e
-PR_NUMBER=updateme
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/t1q6b4h2
 docker build -f prod.Dockerfile -t universal-application-tool .
 docker tag universal-application-tool:latest public.ecr.aws/t1q6b4h2/universal-application-tool:$PR_NUMBER
@@ -25,3 +30,5 @@ echo "The following resources might be replaced.  Please confirm these changes a
 for csn in $(aws cloudformation describe-change-set --change-set-name auto-changeset-pr-updateme  --stack-name uat | jq -r '.Changes[].ResourceChange.ChangeSetId') ; do
 	aws cloudformation describe-change-set --change-set-name $csn | jq '.Changes[] | if .ResourceChange.Replacement == "True" then .ResourceChange.LogicalResourceId else null end' >> /tmp/message
 done
+
+echo "::set-output name=changes::$(cat /tmp/message)"
