@@ -39,11 +39,22 @@ jobs:
           echo "If that won't work for you for some reason, say because you are an OSS contributor who does not have collaborator perms on the repo,"
           echo "you can run bin/deploy-prod and verify your changes for yourself in an AWS account that you have access to."
           exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
       - uses: mshick/add-pr-comment@v1
         if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
         with:
           message: |
             I noticed that you have created a PR which seems to contain a file that updates CloudFormation.
-            I'm going to try to create a change set.
+            I'm going to try to create a change set against the production UAT stack.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
