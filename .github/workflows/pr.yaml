@@ -18,4 +18,11 @@ jobs:
         # Confirm that we get a response on port 9000.
         run: while ! docker run --network host appropriate/curl -v -s --retry-max-time 180 --retry-connrefused http://localhost:9000/ ; do sleep 5; done
         timeout-minutes: 3
-
+  cloudformation:
+    runs-on: ubuntu-latest
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+      - name: check out pr branch
+        uses: actions/checkout@v2
+        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
