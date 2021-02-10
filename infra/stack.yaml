@@ -56,6 +56,23 @@ Resources:
         PrivateSubnet2: !GetAtt 'VPC.Outputs.PrivateSubnet2'
         LBTargetName: !GetAtt 'LB.Outputs.LBTarget'
         ContainerSecurityGroup: !GetAtt 'SecurityGroups.Outputs.ContainerGroup'
+  StackTTL:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      # A template provided by AWS that automatically deletes the current stack after a number of minutes.
+      TemplateURL: !Sub 'https://s3.amazonaws.com/seattle-uat-cftmpl/${Timestamp}/ttl.yaml'
+      Parameters:
+        StackName: !Ref 'AWS::StackName'
+        TTL: '25'
+    Condition: IsTest
+Conditions:
+  IsProd: !Equals
+    - !Ref 'AWS::StackName'
+    - "uat"
+  IsTest: !Not 
+    - !Equals
+      - !Ref 'AWS::StackName'
+      - "uat"
 Outputs:
   WebRoot:
     Description: The DNS name of the load balancer.
