@@ -34,7 +34,6 @@ Resources:
   postgresdb:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: database
       DBName: postgres
       DBInstanceClass: db.t3.small # update to db.m5.large for prod - t3.small is cheap and slow for dev/test.
       AllocatedStorage: 50

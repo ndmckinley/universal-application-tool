@@ -56,3 +56,7 @@ Resources:
         PrivateSubnet2: !GetAtt 'VPC.Outputs.PrivateSubnet2'
         LBTargetName: !GetAtt 'LB.Outputs.LBTarget'
         ContainerSecurityGroup: !GetAtt 'SecurityGroups.Outputs.ContainerGroup'
+Outputs:
+  WebRoot:
+    Description: The DNS name of the load balancer.
+    Value: !GetAtt 'LB.Outputs.LBEndpoint'
