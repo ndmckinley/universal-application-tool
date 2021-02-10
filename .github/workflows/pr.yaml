@@ -23,7 +23,7 @@ jobs:
         timeout-minutes: 3
         if: false
   cloudformation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04 # for older version of awscli.
     steps:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.3
@@ -41,17 +41,16 @@ jobs:
           exit 1
 
       - name: Checkout
+        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
         uses: actions/checkout@v2
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-
       - name: Run check-change.
+        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
         id: check_change
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }}
         run: bin/check-cfn-change
 
       - uses: mshick/add-pr-comment@v1
@@ -60,6 +59,11 @@ jobs:
           message: |
             I noticed that you have created a PR which seems to contain a file that updates CloudFormation.
             
+            The following objects will be recreated (or conditionally recreated) - please take a look and make sure
+            this is correct before submitting your PR.
+
+            ```
             ${{ steps.check_change.outputs.changes_msg }}
+            ```
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
