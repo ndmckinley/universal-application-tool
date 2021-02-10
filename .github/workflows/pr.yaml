@@ -27,12 +27,23 @@ jobs:
     steps:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.3
-      - name: check out pr branch
-        uses: actions/checkout@v2
-        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
+      - name: fail if created from a fork
+        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/') && secrets.GITHUB_TOKEN == ""
+        run: |
+          echo "Sorry, you created this PR from a fork and therefore we don't have access to the secrets we need to run this test."
+          echo "We actually can't even post this as a comment to the GitHub PR, so you probably found this in the logs while trying to figure out what failed."
+          echo "This is for genuinely good security reasons - GitHub doesn't authorize PRs from forks to have access to secrets, but allows"
+          echo "access to any commits deemed 'safe enough' to push to the main repo."
+          echo
+          echo "To fix this issue, just push your branch to the main repo, close the PR that generated this error, and open another one."
+          echo "If that won't work for you for some reason, say because you are an OSS contributor who does not have collaborator perms on the repo,"
+          echo "you can run bin/deploy-prod and verify your changes for yourself in an AWS account that you have access to."
+          exit 1
       - uses: mshick/add-pr-comment@v1
+        if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
         with:
           message: |
-            ** Howdy Howdy Howdy! **
+            I noticed that you have created a PR which seems to contain a file that updates CloudFormation.
+            I'm going to try to create a change set.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
