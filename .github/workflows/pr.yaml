@@ -12,12 +12,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Run tests in tester
         run: docker build -t uat ./; docker run -v /var/run/docker.sock:/var/run/docker.sock uat sbt clean test
+        # DO NOT SUBMIT JUST FOR TESTING
+        if: false
       - name: Build the stack
         run: docker-compose up -d
+        if: false
       - name: Test
         # Confirm that we get a response on port 9000.
         run: while ! docker run --network host appropriate/curl -v -s --retry-max-time 180 --retry-connrefused http://localhost:9000/ ; do sleep 5; done
         timeout-minutes: 3
+        if: false
   cloudformation:
     runs-on: ubuntu-latest
     steps:
@@ -26,3 +30,9 @@ jobs:
       - name: check out pr branch
         uses: actions/checkout@v2
         if: contains(toJSON(steps.file_changes.outputs.files), 'infra/')
+      - uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            ** Howdy Howdy Howdy! **
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
